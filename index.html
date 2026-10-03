@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ABDO Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0A0A;--card:#161616;--ink:#F5F5F7;--mut:#9A9A9F;--line:#262626;--navy:#111111;--navy2:#1A1A1A;--acc:#D4AF37;--gold:#D4AF37;--sent:#C5A059;--warn:#E05A47;--dk:#1A1A1A;color-scheme:dark;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,-apple-system,sans-serif;max-width:520px;margin-inline:auto;display:flex;flex-direction:column}
+.view{display:none;flex:1;min-height:0;flex-direction:column}.view.on{display:flex}
+header{background:rgba(18,18,20,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.05);width:100%;z-index:100}
+header h1{font-size:18px;margin:0;flex:1;font-weight:700}
+header button{background:rgba(255,255,255,.1);border:0;color:#fff;font:inherit;cursor:pointer;padding:7px 11px;border-radius:10px}
+.mark{width:34px;height:34px;border-radius:11px;border:1.5px solid var(--gold);color:var(--gold);display:grid;place-items:center;font-weight:700}
+.badge{background:var(--gold);color:var(--navy);font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px}
+.auth{background:linear-gradient(160deg,#000,#120F06 60%,#2A2009);color:#fff;padding:36px 20px;justify-content:center;text-align:center;overflow:auto}
+.logo{width:84px;height:84px;border-radius:26px;border:2px solid var(--gold);display:grid;place-items:center;font-weight:700;color:var(--gold);letter-spacing:2px;margin:0 auto 14px;background:rgba(255,255,255,.06)}
+.auth h2{margin:0 0 4px;font-size:26px}.sub{color:#ffffffb3;margin:0;font-size:14px}
+.card{background:var(--card);color:var(--ink);border-radius:24px;padding:22px 18px;box-shadow:0 20px 50px rgba(0,0,0,.35);margin-top:22px;text-align:start}
+.lbl{display:block;font-size:13px;color:var(--mut);margin-bottom:8px}
+input,select,textarea{font:inherit;width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:16px}
+.phoneRow{display:flex;gap:8px;direction:ltr}.country-select{position:relative;display:flex;align-items:center;gap:6px;padding:0 14px;border-radius:12px;background:var(--bg);border:1px solid var(--line);flex:none;font-size:15px;color:var(--ink)}
+.country-select svg{color:var(--mut)}
+.country-select select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;padding:0;border:0}
+.country-select:focus-within{outline:3px solid var(--acc);outline-offset:2px}
+#v-phone{position:relative;padding-top:76px}
+.top-nav{position:absolute;top:0;inset-inline:0;display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+.nav-title{font-size:15px;font-weight:700;color:var(--gold)}
+.nav-actions{min-width:40px;display:flex;justify-content:flex-end}
+.icon-btn{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.08);color:#fff;display:grid;place-items:center;cursor:pointer;font:inherit;font-size:15px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.hint span{color:var(--gold);font-weight:700;letter-spacing:2px}.phoneRow input{text-align:left}
+#otp{text-align:center;direction:ltr;letter-spacing:8px;font-size:22px}
+.btn{font:inherit;font-weight:700;width:100%;margin-top:14px;padding:14px;border:0;border-radius:12px;background:var(--acc);color:var(--dk);font-size:16px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:wait}.btn.sm{width:auto;margin:0;padding:7px 12px;font-size:13px;border-radius:9px}.btn.red{background:var(--warn);color:#fff}.btn.gh{background:#222;color:var(--ink)}
+.link{background:none;border:0;color:#ffffffb3;font:inherit;margin-top:18px;cursor:pointer;text-decoration:underline}
+.hint{font-size:12px;color:var(--mut);margin-top:12px;line-height:1.8;text-align:center}
+.err{color:var(--warn);font-size:13px;min-height:18px;margin-top:8px}
+.list{overflow:auto;flex:1}
+.row{display:flex;gap:12px;align-items:center;padding:13px 16px;background:var(--card);border-bottom:1px solid var(--line);cursor:pointer}
+.av{width:46px;height:46px;border-radius:50%;border:1px solid #3a3320;background:linear-gradient(135deg,#242424,#111);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.av.sys{background:linear-gradient(135deg,#D4AF37,#8A6D1F);color:var(--dk)}.unread{min-width:21px;height:21px;border-radius:99px;background:var(--acc);color:var(--dk);font-size:12px;font-weight:700;display:grid;place-items:center;padding:0 6px}
+.row .t{flex:1;min-width:0}.row b{display:block;font-size:15px}.row small{color:var(--mut);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msgs{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:7px;background:radial-gradient(circle at 18% 8%,rgba(212,175,55,.16),transparent 45%),radial-gradient(circle at 88% 82%,rgba(197,160,89,.10),transparent 50%),#0A0A0A}
+.m{max-width:75%;padding:12px 16px;margin:2px 0;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--ink);align-self:flex-start;border-radius:20px;border-end-start-radius:4px;border:1px solid rgba(255,255,255,.04);font-size:15px;line-height:1.6;word-break:break-word}
+.m.me{align-self:flex-end;background:var(--sent);color:var(--dk);border-color:transparent;border-radius:20px;border-end-end-radius:4px;box-shadow:0 4px 15px rgba(197,160,89,.15);font-weight:500}
+.m i{display:block;font-style:normal;font-size:11px;color:var(--mut);margin-top:2px}.m.me i{color:#1A1A1Ab3;font-weight:400}
+.compose{display:flex;gap:8px;padding:10px;background:rgba(18,18,20,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.05)}
+.compose input{border-radius:99px;padding:11px 18px;font-size:15px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--ink)}
+.compose input::placeholder{color:var(--mut)}
+.compose button{border:0;border-radius:50%;width:46px;height:46px;background:linear-gradient(135deg,#D4AF37,#B8923A);color:var(--dk);cursor:pointer;flex:none;display:grid;place-items:center;box-shadow:0 4px 14px rgba(212,175,55,.35)}.compose button svg{transform:scaleX(-1)}
+.tabs{display:flex;background:rgba(18,18,20,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.05)}
+.tabs button{flex:1;padding:10px 4px;border:0;background:none;font:inherit;font-size:12px;color:var(--mut);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}.tabs button span{font-size:19px}.tabs button.on{color:var(--acc);font-weight:700}
+.dots{display:flex;gap:14px;justify-content:center;margin:22px 0 6px;direction:ltr}.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--gold)}.dots i.f{background:var(--gold)}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:14px;justify-content:center;margin-top:18px;direction:ltr}
+.pad button{height:72px;border-radius:50%;border:1px solid #ffffff30;background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:24px;cursor:pointer}
+.pad button:active{background:rgba(255,255,255,.22)}
+#pinErr{color:#FF9C8A;min-height:20px;font-size:14px}
+.shake{animation:sh .35s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
+.pad-in{padding:14px}
+.glass-avatar{position:relative;flex:none}.glass-avatar .av{width:40px;height:40px}
+.online-indicator{position:absolute;bottom:0;inset-inline-end:0;width:11px;height:11px;border-radius:50%;background:#34C759;border:2px solid #121214}
+.who{flex:1;min-width:0}.who h4{margin:0;font-size:16px;font-weight:700}.status{font-size:12px;color:#34C759}
+#v-chat,#v-chats,#v-admin{position:relative}
+#v-chat>header,#v-chats>header,#v-admin>header{position:absolute;top:0;inset-inline:0}
+#v-chat .compose,#v-chats .tabs,#v-admin .tabs{position:absolute;bottom:0;inset-inline:0;z-index:100}
+#v-chat .msgs{padding:84px 14px 84px}
+#v-chats .list{padding:68px 0 66px}
+#v-admin .list{padding:80px 14px 80px}
+.c2{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px}.c2 h3{font-size:14px;margin:0 0 10px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:16px;padding:14px;border-inline-start:3px solid var(--gold)}.stat b{font-size:28px;display:block}.stat span{font-size:12px;color:var(--mut)}
+.chart{display:flex;align-items:flex-end;gap:8px;height:120px}
+.bar{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;font-size:11px;color:var(--mut)}
+.bar i{display:block;width:100%;border-radius:6px 6px 0 0;background:linear-gradient(var(--acc),#8A6D1F);min-height:3px}
+.lg{font-size:13px;padding:8px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}.lg:last-child{border:0}.lg small{color:var(--mut);flex:none}
+.urow{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.urow:last-child{border:0}.urow .t{flex:1;min-width:0}.urow b{display:block;font-size:14px}.urow small{color:var(--mut);direction:ltr;display:inline-block}
+.mrow{padding:10px 0;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:flex-start}.mrow:last-child{border:0}.mrow .t{flex:1;min-width:0;font-size:14px;word-break:break-word}.mrow small{display:block;color:var(--mut);font-size:11px;margin-bottom:2px}
+.bc{display:flex;gap:8px}.bc input{padding:10px}
+.tog{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:14px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+
+/* ===== شاشة الدخول: تنسيق الذهب الملكي ===== */
+#v-phone{padding:20px;justify-content:space-between;background-color:#0B0B0D;background-image:radial-gradient(circle at 50% 90%,rgba(197,160,89,.12) 0%,transparent 60%)}
+#v-phone .top-nav{position:static;padding:10px 0}
+#v-phone .nav-title{font-size:16px;font-weight:600;letter-spacing:.5px;color:#fff}
+#v-phone .icon-btn{width:auto;height:auto;padding:6px;background:none;border:0;border-radius:0;opacity:.8;transition:opacity .2s;backdrop-filter:none;-webkit-backdrop-filter:none}
+#v-phone .icon-btn:hover{opacity:1}
+#v-phone .hero-section{display:flex;flex-direction:column;align-items:center;text-align:center;margin:auto 0}
+#v-phone .logo{width:84px;height:84px;background:#141417;border:1.5px solid var(--gold);border-radius:22px;margin:0 0 20px;box-shadow:0 0 25px rgba(212,175,55,.15);font-size:18px;letter-spacing:1px}
+#v-phone h2{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+#v-phone .sub{font-size:13px;color:#8E8E93}
+#v-phone .card{background:#141417;border:1px solid rgba(255,255,255,.06);border-radius:24px;padding:20px;margin:0 0 10px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#v-phone .lbl{font-size:12px;color:#8E8E93;margin-bottom:8px}
+#v-phone .phoneRow{gap:10px}
+#v-phone .country-select,#v-phone .phoneRow input{background:#0D0D0F;border:1px solid rgba(255,255,255,.08);border-radius:12px;transition:border-color .3s}
+#v-phone .country-select{padding:12px 14px;gap:8px;font-size:13px}
+#v-phone .phoneRow input{padding:12px 16px;font-size:15px;text-align:right}
+#v-phone .phoneRow input::placeholder{color:#4A4A4F}
+#v-phone .phoneRow input:focus{border-color:var(--gold)}
+#v-phone .err{margin-top:6px}
+#v-phone #send{background:linear-gradient(135deg,#E5C568 0%,#C5A059 100%);color:#111;border-radius:14px;padding:14px;font-size:15px;font-weight:600;margin-top:6px;box-shadow:0 4px 15px rgba(197,160,89,.25);transition:opacity .2s,transform .1s}
+#v-phone #send:hover{opacity:.92;transform:translateY(-1px)}
+#v-phone .hint{font-size:11px;color:#8E8E93;margin-top:14px}
+#v-phone .hint span{font-weight:600;letter-spacing:0}
+@media (prefers-reduced-motion:reduce){#v-phone #send:hover{transform:none}}
+
+/* ===== iOS Glass: شاشة الدخول (حسب الملف المرفق) ===== */
+#v-phone{--gold-gradient:linear-gradient(135deg,#F3E5AB 0%,#D4AF37 50%,#AA7C11 100%);--text-muted:rgba(255,255,255,.55);
+  padding:24px;overflow-x:hidden;background-color:#0C0C0F;background-image:none}
+.glow-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.ambient-glow{position:absolute;width:250px;height:250px;border-radius:50%;filter:blur(70px);opacity:.35}
+.glow-1{top:-50px;left:-50px;background:rgba(212,175,55,.4)}
+.glow-2{bottom:-50px;right:-50px;background:rgba(100,80,200,.3)}
+#v-phone>*:not(.glow-layer){position:relative;z-index:2}
+#v-phone .top-nav{position:static;padding:0}
+#v-phone .nav-actions{display:flex;gap:8px}
+#v-phone .nav-title{font-size:15px;font-weight:600;letter-spacing:.3px;color:#fff}
+#v-phone .icon-btn{width:36px;height:36px;padding:0;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:none;opacity:1;color:#fff;transition:all .2s ease}
+#v-phone .icon-btn:hover{background:rgba(255,255,255,.15);transform:scale(1.05)}
+#v-phone .logo{width:88px;height:88px;background:rgba(20,20,25,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1.5px solid var(--gold);border-radius:26px;margin:0 0 20px;box-shadow:0 10px 30px rgba(212,175,55,.25),inset 0 1px 0 rgba(255,255,255,.2)}
+#v-phone .logo span{background:var(--gold-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:20px;letter-spacing:1px}
+#v-phone h2{font-size:26px;font-weight:700;margin:0 0 6px;letter-spacing:.4px}
+#v-phone .sub{font-size:13px;color:var(--text-muted)}
+#v-phone .card{background:rgba(25,25,32,.45);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border:1px solid rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.15);border-radius:28px;padding:22px;margin:0;box-shadow:0 20px 40px rgba(0,0,0,.5)}
+#v-phone .lbl{font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:500}
+#v-phone .country-select,#v-phone .phoneRow input{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:none}
+#v-phone .country-select{padding:12px 14px;gap:8px;font-size:13px;transition:background .2s}
+#v-phone .country-select:hover{background:rgba(255,255,255,.09)}
+#v-phone .phoneRow input{padding:12px 16px;font-size:16px;text-align:right;transition:all .3s ease}
+#v-phone .phoneRow input::placeholder{color:rgba(255,255,255,.2)}
+#v-phone .phoneRow input:focus{border-color:var(--gold);background:rgba(255,255,255,.08);box-shadow:0 0 15px rgba(212,175,55,.15)}
+#v-phone #send{background:var(--gold-gradient);color:#111114;border:0;border-radius:16px;padding:15px;font-size:15px;font-weight:700;margin-top:10px;box-shadow:0 8px 25px rgba(212,175,55,.3);transition:all .2s ease}
+#v-phone #send:hover{opacity:.95;transform:translateY(-2px);box-shadow:0 12px 30px rgba(212,175,55,.4)}
+#v-phone #send:active{transform:scale(.97)}
+#v-phone #send:disabled{opacity:.6;transform:none}
+#v-phone .hint{font-size:11px;color:var(--text-muted);margin-top:14px}
+@media (prefers-reduced-motion:reduce){#v-phone .icon-btn:hover,#v-phone #send:hover,#v-phone #send:active{transform:none}}
+
+/* ===== شاشة OTP (نفس الزجاج) ===== */
+/* ===== شاشة الدخول: تنسيق الذهب الملكي ===== */
+#v-otp{padding:20px;justify-content:space-between;background-color:#0B0B0D;background-image:radial-gradient(circle at 50% 90%,rgba(197,160,89,.12) 0%,transparent 60%)}
+#v-otp .top-nav{position:static;padding:10px 0}
+#v-otp .nav-title{font-size:16px;font-weight:600;letter-spacing:.5px;color:#fff}
+#v-otp .icon-btn{width:auto;height:auto;padding:6px;background:none;border:0;border-radius:0;opacity:.8;transition:opacity .2s;backdrop-filter:none;-webkit-backdrop-filter:none}
+#v-otp .icon-btn:hover{opacity:1}
+#v-otp .hero-section{display:flex;flex-direction:column;align-items:center;text-align:center;margin:auto 0}
+#v-otp .logo{width:84px;height:84px;background:#141417;border:1.5px solid var(--gold);border-radius:22px;margin:0 0 20px;box-shadow:0 0 25px rgba(212,175,55,.15);font-size:18px;letter-spacing:1px}
+#v-otp h2{font-size:24px;margin:0 0 6px;letter-spacing:.5px}
+#v-otp .sub{font-size:13px;color:#8E8E93}
+#v-otp .card{background:#141417;border:1px solid rgba(255,255,255,.06);border-radius:24px;padding:20px;margin:0 0 10px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#v-otp .lbl{font-size:12px;color:#8E8E93;margin-bottom:8px}
+#v-otp .phoneRow{gap:10px}
+#v-otp .country-select,#v-otp .phoneRow input{background:#0D0D0F;border:1px solid rgba(255,255,255,.08);border-radius:12px;transition:border-color .3s}
+#v-otp .country-select{padding:12px 14px;gap:8px;font-size:13px}
+#v-otp .phoneRow input{padding:12px 16px;font-size:15px;text-align:right}
+#v-otp .phoneRow input::placeholder{color:#4A4A4F}
+#v-otp .phoneRow input:focus{border-color:var(--gold)}
+#v-otp .err{margin-top:6px}
+#v-otp #verify{background:linear-gradient(135deg,#E5C568 0%,#C5A059 100%);color:#111;border-radius:14px;padding:14px;font-size:15px;font-weight:600;margin-top:6px;box-shadow:0 4px 15px rgba(197,160,89,.25);transition:opacity .2s,transform .1s}
+#v-otp #verify:hover{opacity:.92;transform:translateY(-1px)}
+#v-otp .hint{font-size:11px;color:#8E8E93;margin-top:14px}
+#v-otp .hint span{font-weight:600;letter-spacing:0}
+@media (prefers-reduced-motion:reduce){#v-otp #verify:hover{transform:none}}
+
+/* ===== iOS Glass: شاشة الدخول (حسب الملف المرفق) ===== */
+#v-otp{--gold-gradient:linear-gradient(135deg,#F3E5AB 0%,#D4AF37 50%,#AA7C11 100%);--text-muted:rgba(255,255,255,.55);
+  padding:24px;overflow-x:hidden;background-color:#0C0C0F;background-image:none}
+.glow-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.ambient-glow{position:absolute;width:250px;height:250px;border-radius:50%;filter:blur(70px);opacity:.35}
+.glow-1{top:-50px;left:-50px;background:rgba(212,175,55,.4)}
+.glow-2{bottom:-50px;right:-50px;background:rgba(100,80,200,.3)}
+#v-otp>*:not(.glow-layer){position:relative;z-index:2}
+#v-otp .top-nav{position:static;padding:0}
+#v-otp .nav-actions{display:flex;gap:8px}
+#v-otp .nav-title{font-size:15px;font-weight:600;letter-spacing:.3px;color:#fff}
+#v-otp .icon-btn{width:36px;height:36px;padding:0;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:none;opacity:1;color:#fff;transition:all .2s ease}
+#v-otp .icon-btn:hover{background:rgba(255,255,255,.15);transform:scale(1.05)}
+#v-otp .logo{width:88px;height:88px;background:rgba(20,20,25,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1.5px solid var(--gold);border-radius:26px;margin:0 0 20px;box-shadow:0 10px 30px rgba(212,175,55,.25),inset 0 1px 0 rgba(255,255,255,.2)}
+#v-otp .logo span{background:var(--gold-gradient);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:20px;letter-spacing:1px}
+#v-otp h2{font-size:26px;font-weight:700;margin:0 0 6px;letter-spacing:.4px}
+#v-otp .sub{font-size:13px;color:var(--text-muted)}
+#v-otp .card{background:rgba(25,25,32,.45);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border:1px solid rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.15);border-radius:28px;padding:22px;margin:0;box-shadow:0 20px 40px rgba(0,0,0,.5)}
+#v-otp .lbl{font-size:12px;color:var(--text-muted);margin-bottom:8px;font-weight:500}
+#v-otp .country-select,#v-otp .phoneRow input{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:none}
+#v-otp .country-select{padding:12px 14px;gap:8px;font-size:13px;transition:background .2s}
+#v-otp .country-select:hover{background:rgba(255,255,255,.09)}
+#v-otp .phoneRow input{padding:12px 16px;font-size:16px;text-align:right;transition:all .3s ease}
+#v-otp .phoneRow input::placeholder{color:rgba(255,255,255,.2)}
+#v-otp .phoneRow input:focus{border-color:var(--gold);background:rgba(255,255,255,.08);box-shadow:0 0 15px rgba(212,175,55,.15)}
+#v-otp #verify{background:var(--gold-gradient);color:#111114;border:0;border-radius:16px;padding:15px;font-size:15px;font-weight:700;margin-top:10px;box-shadow:0 8px 25px rgba(212,175,55,.3);transition:all .2s ease}
+#v-otp #verify:hover{opacity:.95;transform:translateY(-2px);box-shadow:0 12px 30px rgba(212,175,55,.4)}
+#v-otp #verify:active{transform:scale(.98)}
+#v-otp #verify:disabled{opacity:.6;transform:none}
+#v-otp .hint{font-size:11px;color:var(--text-muted);margin-top:14px}
+@media (prefers-reduced-motion:reduce){#v-otp .icon-btn:hover,#v-otp #verify:hover,#v-otp #verify:active{transform:none}}
+
+#v-otp{position:relative}
+#v-otp #change{margin-top:10px;border-radius:16px;padding:14px;background:rgba(255,255,255,.06);color:var(--ink);border:1px solid rgba(255,255,255,.1)}
+.otp-boxes{display:flex;gap:10px;justify-content:center;margin:6px 0 8px}
+.otp-box{flex:1;min-width:0;max-width:52px;height:58px;padding:0;text-align:center;font-size:24px;font-weight:700;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#fff;caret-color:var(--gold);transition:all .25s ease}
+.otp-box:focus{outline:none;border-color:rgba(212,175,55,.6);background:rgba(255,255,255,.09)}
+.otp-box.f{border-color:var(--gold);background:rgba(212,175,55,.1);box-shadow:0 0 18px rgba(212,175,55,.45),inset 0 1px 0 rgba(255,255,255,.15)}
+/* ===== عام ===== */
+[hidden]{display:none!important}
+html[dir=ltr] #v-phone .phoneRow input{text-align:left}
+#v-phone .icon-btn.lang-btn,#v-otp .icon-btn.lang-btn{width:auto;padding:0 12px;border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.6px}
+.tabs em{font-style:normal}
+.e2e{display:flex;align-items:center;gap:6px;margin-top:12px;padding:6px 12px;border-radius:99px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.25);font-size:12px;font-weight:500}
+.shimmer{background:linear-gradient(100deg,rgba(255,255,255,.45) 20%,#F3E5AB 50%,rgba(255,255,255,.45) 80%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+button{position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;transition:transform .12s ease}
+button:active:not(:disabled){transform:scale(.97)}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.4);transform:scale(0);opacity:.7;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){
+  .glow-1{animation:drift1 22s ease-in-out infinite alternate}
+  .glow-2{animation:drift2 27s ease-in-out infinite alternate}
+  .shimmer{animation:shim 3.5s linear infinite}
+  .ripple{animation:rip .55s ease-out forwards}
+}
+@keyframes drift1{to{transform:translate(120px,90px) scale(1.15)}}
+@keyframes drift2{to{transform:translate(-110px,-80px) scale(1.1)}}
+@keyframes shim{to{background-position:-200% 0}}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+
+/* ===== ميزات التفاعل ===== */
+.m{position:relative;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.m.hasr{margin-bottom:12px}
+.react{position:absolute;bottom:-12px;inset-inline-end:10px;padding:1px 6px;border-radius:99px;font-size:13px;font-weight:400;background:rgba(24,24,28,.92);border:1px solid rgba(212,175,55,.5);box-shadow:0 0 10px rgba(212,175,55,.3)}
+.rmenu{position:fixed;z-index:700;display:flex;gap:4px;padding:8px 10px;border-radius:99px;background:rgba(24,24,28,.72);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 40px rgba(0,0,0,.6),0 0 24px rgba(212,175,55,.25),inset 0 1px 0 rgba(255,255,255,.2)}
+.remo{width:40px;height:40px;padding:0;border:0;background:none;font-size:26px;cursor:pointer;overflow:visible;text-shadow:0 6px 14px rgba(212,175,55,.55);transform-origin:50% 100%;animation:pop .35s cubic-bezier(.2,1.5,.4,1) backwards}
+.remo:hover,.remo:focus-visible{transform:translateY(-6px) scale(1.25) rotateX(-12deg)}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.4) rotateX(50deg)}}
+.m.voice,.m.voice.me{min-width:230px;background:rgba(255,255,255,.06);color:var(--ink);border:1px solid rgba(212,175,55,.3);box-shadow:none}
+.m.voice.me{background:rgba(212,175,55,.08)}.m.voice.me i{color:var(--mut)}
+.vn{display:flex;align-items:center;gap:10px}
+.vplay{width:38px;height:38px;border-radius:50%;border:0;padding:0;flex:none;background:linear-gradient(135deg,#F3E5AB,#D4AF37,#AA7C11);color:#111;font-size:12px;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 14px rgba(212,175,55,.35)}
+.wave{display:flex;align-items:center;gap:3px;height:32px;flex:1;min-width:110px}
+.wave span{flex:1;min-width:2px;border-radius:2px;background:rgba(255,255,255,.28);transition:background .15s,box-shadow .15s}
+.wave span.on{background:linear-gradient(#F3E5AB,#D4AF37);box-shadow:0 0 8px rgba(212,175,55,.6)}
+.vdur{font-size:12px;color:var(--mut);font-variant-numeric:tabular-nums}
+.compose #micBtn{background:rgba(255,255,255,.08);color:var(--ink);box-shadow:none;border:1px solid rgba(255,255,255,.12);font-size:18px}
+.compose #micBtn.rec{background:var(--warn);color:#fff}
+.ring{position:relative;flex:none;padding:3px;border-radius:50%}
+.ring::before{content:'';position:absolute;inset:0;border-radius:50%;opacity:0;background:conic-gradient(from 0deg,#F3E5AB,#D4AF37,#E5E4E2,#AA7C11,#F3E5AB)}
+.ring.new::before{opacity:1}.ring.seen::before{opacity:1;background:#3a3a3e}
+.ring.new,.ring.seen{cursor:pointer}
+.ring .av{position:relative;border:2px solid var(--card)}
+.island{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);width:120px;height:34px;border-radius:22px;background:rgba(10,10,12,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);box-shadow:0 10px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);display:flex;align-items:center;gap:10px;padding:0 6px;overflow:hidden;z-index:500;opacity:0;pointer-events:none;cursor:pointer;transition:width .45s cubic-bezier(.2,1.2,.3,1),height .45s cubic-bezier(.2,1.2,.3,1),border-radius .45s,opacity .25s}
+.island.open{width:min(92vw,460px);height:68px;border-radius:34px;padding:0 12px;opacity:1;pointer-events:auto}
+.island .av{width:44px;height:44px;flex:none}
+.itext{min-width:0;opacity:0;transition:opacity .25s .15s;text-align:start}.island.open .itext{opacity:1}
+.itext b,.itext span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.itext span{font-size:13px;color:var(--mut)}
+.toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 90px);left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:99px;background:rgba(24,24,28,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:800}.toast.show{opacity:1}
+.bio,.story{position:fixed;inset:0;z-index:600;display:grid;place-items:center;padding:24px;background:rgba(5,5,7,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:opacity .45s,backdrop-filter .45s}
+.bio.open{opacity:0;backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0)}
+.bio-card,.story-card{width:min(100%,340px);text-align:center;padding:26px 20px;border-radius:28px;background:rgba(25,25,32,.6);backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);border:1px solid rgba(255,255,255,.08);border-top:1px solid rgba(255,255,255,.18);box-shadow:0 20px 50px rgba(0,0,0,.6);transition:transform .45s}
+.bio.open .bio-card{transform:scale(1.15)}
+.bio-card h3{margin:0 0 4px;font-size:20px}.bio-card p{margin:0 0 6px;color:var(--mut);font-size:14px}
+.face{position:relative;width:120px;height:120px;border-radius:32px;display:grid;place-items:center;margin:0 auto 16px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.35);box-shadow:0 0 30px rgba(212,175,55,.25),inset 0 1px 0 rgba(255,255,255,.15);overflow:hidden}
+.face .chk{display:none}.face.ok .chk{display:block}.face.ok .fc{display:none}
+.face.scan::after{content:'';position:absolute;inset-inline:10%;top:14%;height:2px;background:linear-gradient(90deg,transparent,#F3E5AB,transparent);box-shadow:0 0 12px #D4AF37}
+.story-card{text-align:start}.sbar{height:3px;border-radius:2px;background:rgba(255,255,255,.2);overflow:hidden;margin-bottom:14px}
+.sbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#F3E5AB,#D4AF37)}
+.shead{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.story-card p{font-size:20px;line-height:1.7;margin:0 0 6px;min-height:90px}
+@media (prefers-reduced-motion:no-preference){
+  .ring.new::before{animation:spin 7s linear infinite}
+  .ring.new{animation:ringp 2.4s ease-in-out infinite}
+  .vn.playing .wave span.on{animation:wv .6s ease-in-out infinite alternate}
+  .compose #micBtn.rec{animation:recp 1s ease-in-out infinite}
+  .face{animation:glowp 2.6s ease-in-out infinite}
+  .face.scan::after{animation:scanl 1.2s ease-in-out infinite alternate}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ringp{50%{filter:drop-shadow(0 0 7px rgba(212,175,55,.65))}}
+@keyframes wv{from{transform:scaleY(.65)}to{transform:scaleY(1)}}
+@keyframes recp{50%{box-shadow:0 0 0 8px rgba(224,90,71,.25)}}
+@keyframes glowp{50%{box-shadow:0 0 46px rgba(212,175,55,.5),inset 0 1px 0 rgba(255,255,255,.15)}}
+@keyframes scanl{to{top:84%}}
+.urow{flex-wrap:wrap}.acts{display:flex;gap:6px;width:100%;flex-wrap:wrap;padding-inline-start:56px}.c2 .btn{margin-top:10px}
+</style>
+</head>
+<body>
+<div id="island" class="island" role="status" aria-live="polite"></div>
+<div id="toast" class="toast" role="status"></div>
+
+<section id="v-phone" class="view auth on">
+  <div class="glow-layer" aria-hidden="true"><div class="ambient-glow glow-1"></div><div class="ambient-glow glow-2"></div></div>
+  <div class="top-nav">
+    <button class="icon-btn" id="clearBtn" aria-label="مسح">&#10005;</button>
+    <span class="nav-title">ABDO Chat</span>
+    <div class="nav-actions"><button class="icon-btn lang-btn" type="button" aria-label="Language"></button><button class="icon-btn" id="shareBtn" aria-label="مشاركة"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg></button></div>
+  </div>
+  <div class="hero-section">
+    <div class="logo"><span>ABDO</span></div>
+    <h2>ABDO Chat</h2>
+    <p class="sub" data-i="sub">محادثات آمنة بأسلوب أنيق</p>
+    <div class="e2e" id="e2e"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg><span class="shimmer" data-i="e2e">مشفّرة من طرف إلى طرف</span></div>
+  </div>
+  <div class="card">
+    <label class="lbl" for="phone" data-i="phoneLbl">رقم الجوال</label>
+    <div class="phoneRow">
+      <div class="country-select"><span id="cFlag">🇸🇦</span><span id="cDial">+966</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg><select id="country" aria-label="الدولة"></select></div>
+      <input id="phone" type="tel" inputmode="numeric" placeholder="5XXXXXXXX" maxlength="15" autocomplete="tel-national">
+    </div>
+    <div class="err" id="e1"></div>
+    <button class="btn" id="send" data-i="send">إرسال رمز التحقق</button>
+    <div class="hint" id="demoHint"></div>
+  </div>
+  <div id="recaptcha"></div>
+</section>
+
+<section id="v-otp" class="view auth">
+  <div class="glow-layer" aria-hidden="true"><div class="ambient-glow glow-1"></div><div class="ambient-glow glow-2"></div></div>
+  <div class="top-nav">
+    <button class="icon-btn" id="otpBack" type="button" aria-label="Back">→</button>
+    <span class="nav-title">ABDO Chat</span>
+    <div class="nav-actions"><button class="icon-btn lang-btn" type="button" aria-label="Language"></button></div>
+  </div>
+  <div class="hero-section">
+    <div class="logo"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>
+    <h2 data-i="otpTitle">رمز التحقق</h2>
+    <p class="sub" id="otpTo"></p>
+  </div>
+  <div class="card">
+    <div class="otp-boxes" id="otpBoxes" dir="ltr"></div>
+    <div class="err" id="e2" aria-live="polite"></div>
+    <button class="btn" id="verify" data-i="verify">تأكيد ودخول</button>
+    <button class="btn gh" id="change" data-i="change">تغيير الرقم</button>
+  </div>
+</section>
+
+<section id="v-pin" class="view auth">
+  <div class="logo">🔑</div>
+  <h2>لوحة المدير</h2>
+  <p class="sub">أدخل رمز الدخول</p>
+  <div class="dots" id="dots"><i></i><i></i><i></i><i></i><i></i></div>
+  <div id="pinErr" aria-live="polite"></div>
+  <div class="pad" id="pad"></div>
+</section>
+
+<section id="v-chats" class="view">
+  <header><div class="mark">A</div><h1>ABDO Chat</h1></header>
+  <div class="list" id="chatList"></div>
+  <nav class="tabs"><button class="on"><span>💬</span><em data-i="tChats">المحادثات</em></button><button class="prof"><span>👤</span><em>حسابي</em></button><button class="out"><span>🚪</span><em data-i="tOut">خروج</em></button></nav>
+</section>
+
+<section id="v-chat" class="view">
+  <header><button id="back" aria-label="رجوع">→</button><div class="glass-avatar"><div class="av" id="cAv"></div><span class="online-indicator"></span></div><div class="who"><h4 id="cName"></h4><span class="status" id="cStatus">نشط الآن</span></div></header>
+  <div class="msgs" id="msgs"></div>
+  <div class="compose"><input id="txt" placeholder="اكتب رسالة" autocomplete="off" maxlength="1000" aria-label="الرسالة"><button id="micBtn" type="button" aria-label="تسجيل رسالة صوتية">🎤</button><button id="sendMsg" aria-label="إرسال"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+</section>
+
+<section id="v-admin" class="view">
+  <header><div class="mark">A</div><h1>لوحة المدير</h1><span class="badge">مدير</span><button id="aExit">خروج</button></header>
+  <div class="list pad-in" id="aBody"></div>
+  <nav class="tabs" id="aNav">
+    <button data-tab="ov"><span>📊</span>نظرة عامة</button><button data-tab="us"><span>👥</span>المستخدمون</button>
+    <button data-tab="ms"><span>💬</span>الرسائل</button><button data-tab="st"><span>⚙️</span>الإعدادات</button>
+  </nav>
+</section>
+
+<div id="bio" class="bio" hidden role="dialog" aria-modal="true" aria-labelledby="bioT">
+  <div class="bio-card">
+    <div class="face" id="face"><svg viewBox="0 0 64 64" width="84" height="84" fill="none" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="fc"><path d="M8 22V14a6 6 0 016-6h8M42 8h8a6 6 0 016 6v8M56 42v8a6 6 0 01-6 6h-8M22 56h-8a6 6 0 01-6-6v-8"/><path d="M24 25v5M40 25v5M32 26v9a2 2 0 01-2 2M23 43c5 5 13 5 18 0"/></g><path class="chk" d="M20 33l8 8 17-18"/></svg></div>
+    <h3 id="bioT">محادثة محمية</h3>
+    <p id="bioMsg">المس للتحقق من هويتك</p>
+    <button class="btn" id="bioBtn" type="button">فتح القفل</button>
+    <button class="btn gh" id="bioDemo" type="button" hidden>متابعة (محاكاة تجريبية)</button>
+    <button class="btn gh" id="bioCancel" type="button">إلغاء</button>
+    <div class="hint" id="bioNote"></div>
+  </div>
+</div>
+<div id="story" class="story" hidden role="dialog" aria-modal="true" aria-label="الحالة">
+  <div class="story-card">
+    <div class="sbar"><i id="sprog"></i></div>
+    <div class="shead"><div class="av" id="sAv"></div><b id="sName"></b></div>
+    <p id="sText"></p>
+    <button class="btn gh" id="sClose" type="button">إغلاق</button>
+  </div>
+</div>
+
+<script>
+/* ===== الإعداد =====
+   SMS حقيقي: الصق إعدادات Firebase في firebase (Authentication > Phone) واستضف الملف على نطاقك.
+   مثال: firebase:{apiKey:"...",authDomain:"x.firebaseapp.com",projectId:"x",appId:"..."}
+   بدون ذلك يعمل بوضع تجريبي برمز demoCode. */
+const CONFIG={firebase:{apiKey:"AIzaSyCJk6Pp8jFWunLtZ8xSoAjNCEqNbClz2OE",authDomain:"abdo-chat-879d2.firebaseapp.com",projectId:"abdo-chat-879d2",storageBucket:"abdo-chat-879d2.firebasestorage.app",messagingSenderId:"148906581434",appId:"1:148906581434:web:3987362a8bcb4df684d183"},demoCode:'123456',e2eBadge:true,bioDemo:true}; /* e2eBadge: شارة التشفير شكلية فقط حتى يُنفَّذ تشفير فعلي */
+const PIN_HASH='3f35758dfa43d5c96b22afb0c998781654c3d6bd9b67b840a5683d8278abac94';let PIN_CUR=PIN_HASH;try{PIN_CUR=localStorage.getItem('abdoPin')||PIN_HASH}catch(e){} /* بصمة SHA-256 لرمز المدير */
+
+const COUNTRIES=('SA|السعودية|966;AE|الإمارات|971;KW|الكويت|965;QA|قطر|974;BH|البحرين|973;OM|عُمان|968;YE|اليمن|967;IQ|العراق|964;JO|الأردن|962;SY|سوريا|963;LB|لبنان|961;PS|فلسطين|970;EG|مصر|20;SD|السودان|249;LY|ليبيا|218;TN|تونس|216;DZ|الجزائر|213;MA|المغرب|212;MR|موريتانيا|222;SO|الصومال|252;DJ|جيبوتي|253;KM|جزر القمر|269;TR|تركيا|90;IR|إيران|98;PK|باكستان|92;IN|الهند|91;BD|بنغلاديش|880;AF|أفغانستان|93;LK|سريلانكا|94;NP|نيبال|977;PH|الفلبين|63;ID|إندونيسيا|62;MY|ماليزيا|60;SG|سنغافورة|65;TH|تايلاند|66;VN|فيتنام|84;CN|الصين|86;JP|اليابان|81;KR|كوريا الجنوبية|82;AU|أستراليا|61;NZ|نيوزيلندا|64;US|الولايات المتحدة|1;CA|كندا|1;MX|المكسيك|52;BR|البرازيل|55;AR|الأرجنتين|54;CL|تشيلي|56;CO|كولومبيا|57;PE|بيرو|51;GB|بريطانيا|44;IE|أيرلندا|353;FR|فرنسا|33;DE|ألمانيا|49;IT|إيطاليا|39;ES|إسبانيا|34;PT|البرتغال|351;NL|هولندا|31;BE|بلجيكا|32;CH|سويسرا|41;AT|النمسا|43;SE|السويد|46;NO|النرويج|47;DK|الدنمارك|45;FI|فنلندا|358;PL|بولندا|48;GR|اليونان|30;RU|روسيا|7;UA|أوكرانيا|380;KZ|كازاخستان|7;ZA|جنوب أفريقيا|27;NG|نيجيريا|234;KE|كينيا|254;ET|إثيوبيا|251;GH|غانا|233;SN|السنغال|221;TZ|تنزانيا|255;UG|أوغندا|256;CM|الكاميرون|237;CI|ساحل العاج|225').split(';').map(s=>{const [c,n,d]=s.split('|');return {c,n,d}});
+const flag=c=>String.fromCodePoint(...[...c].map(x=>127397+x.charCodeAt(0)));
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+COUNTRIES.forEach((k,i)=>{const o=el('option',null,flag(k.c)+' '+k.n+' +'+k.d);o.value=i;$('country').appendChild(o)});
+const syncCountry=()=>{const k=COUNTRIES[+$('country').value];$('cFlag').textContent=flag(k.c);$('cDial').textContent='+'+k.d};
+$('country').onchange=syncCountry;syncCountry();
+$('clearBtn').onclick=()=>{$('phone').value='';$('e1').textContent='';$('phone').focus()};
+if(navigator.share){$('shareBtn').onclick=()=>navigator.share({title:'ABDO Chat',text:'انضم إليّ على ABDO Chat',url:location.href}).catch(()=>{})}else $('shareBtn').hidden=true;
+
+const DAY=864e5,NOW=Date.now();
+const state={me:null,cur:null,e164:'',tab:'ov',q:'',open:true,welcome:'مرحبًا بك في تطبيق عبدو 👋',log:[],
+  users:[{id:0,name:'ABDO Chat',phone:'',banned:false},{id:1,name:'سارة العتيبي',phone:'+966551111111',banned:false},{id:2,name:'فهد الشمري',phone:'+971552222222',banned:false},{id:3,name:'مها القحطاني',phone:'+20553333333',banned:false}],
+  msgs:{0:[],1:[{f:1,t:'شفت التحديث الجديد؟',d:NOW-4*DAY},{f:1,t:'تمام',d:NOW-2*DAY},{f:1,t:'هلا! كيف الحال؟',d:NOW-3600e3}],2:[{f:2,t:'متى نلتقي؟',d:NOW-3*DAY},{f:2,t:'مساء الخير',d:NOW-DAY}],3:[{f:3,t:'أبشر',d:NOW-6*DAY},{f:3,t:'شكرًا لك',d:NOW-5*DAY}]}};
+const replies=['تمام، الحمد لله','أبشر','تمت','نتكلم بعدين','شكرًا لك'];
+const show=v=>document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+const time=d=>new Date(d).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+const addLog=t=>{state.log.unshift({t,d:Date.now()});state.log.length=Math.min(state.log.length,30)};
+const nameOf=id=>id===0?'ABDO Chat':(state.me&&id===state.me.id)?'أنت':((state.users.find(u=>u.id===id)||{}).name||'—');
+
+/* ===== التحقق عبر SMS ===== */
+let confirmation=null,verifier=null;
+const loadScript=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('load'));document.head.appendChild(s)});
+async function sendCode(e164){
+  if(!CONFIG.firebase)return;
+  if(!window.firebase){
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js');
+  }
+  if(!firebase.apps.length)firebase.initializeApp(CONFIG.firebase);
+  if(!verifier)verifier=new firebase.auth.RecaptchaVerifier('recaptcha',{size:'invisible'});
+  confirmation=await firebase.auth().signInWithPhoneNumber(e164,verifier);
+}
+async function checkCode(code){
+  if(!CONFIG.firebase)return code===CONFIG.demoCode;
+  await confirmation.confirm(code);return true;
+}
+function errText(e){
+  const c=(e&&e.code)||'';
+  if(c.includes('invalid-phone'))return 'رقم الجوال غير صحيح';
+  if(c.includes('too-many'))return 'محاولات كثيرة، حاول لاحقًا';
+  if(c.includes('invalid-verification'))return 'الرمز غير صحيح';
+  if(c.includes('code-expired'))return 'انتهت صلاحية الرمز';
+  if(e&&e.message==='load')return 'تعذّر الاتصال بالخدمة';
+  return 'حدث خطأ، حاول مرة أخرى';
+}
+$('send').onclick=async()=>{
+  const k=COUNTRIES[+$('country').value],n=$('phone').value.replace(/\D/g,'').replace(/^0+/,'');
+  if(n.length<6||n.length>12){$('e1').textContent=t('errPhone');return}
+  const e164='+'+k.d+n,u=state.users.find(x=>x.phone===e164);
+  if(u&&u.banned){$('e1').textContent=t('errBanned');return}
+  if(!u&&!state.open){$('e1').textContent=t('errClosed');return}
+  $('send').disabled=true;$('e1').textContent='';
+  try{await sendCode(e164);state.e164=e164;renderOtpTo();show('otp');focusOtp()}
+  catch(e){$('e1').textContent=errText(e)}
+  $('send').disabled=false};
+$('verify').onclick=async()=>{
+  $('verify').disabled=true;let ok=false;
+  try{ok=await checkCode(getOtp())}catch(e){$('e2').textContent=errText(e);$('verify').disabled=false;return}
+  $('verify').disabled=false;
+  if(!ok){$('e2').textContent=t('errCode');shakeOtp();return}
+  const p=state.e164;let u=state.users.find(x=>x.phone===p);
+  if(!u){u={id:Date.now(),name:'مستخدم '+p.slice(-4),phone:p,banned:false};state.users.push(u);state.msgs[u.id]=[];addLog('تسجيل مستخدم جديد '+p)}
+  state.me=u;
+  if(!state.msgs[0].some(m=>m.w))state.msgs[0].push({f:0,w:1,t:state.welcome,d:Date.now()});
+  $('e2').textContent='';clearOtp();renderChats();show('chats');scheduleDemo()};
+$('change').onclick=$('otpBack').onclick=()=>{clearOtp();$('e2').textContent='';show('phone')};
+
+/* ===== المحادثات ===== */
+const lastOf=u=>{const a=state.msgs[u.id]||[];return a[a.length-1]};
+state.stories={1:{t:'صباح الخير ☀️ يوم جديد وفرصة جديدة',seen:false},3:{t:'مساء هادئ في الرياض 🌙',seen:false}};
+state.protectedIds=[3];state.unlocked={};
+function mkBars(n,seed){let x=Math.abs(Math.floor(seed))%2147483646+1;return Array.from({length:n},()=>{x=(x*16807)%2147483647;return 25+Math.round((x%1000)/1000*70)})}
+const fmtDur=s=>Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0');
+state.msgs[2].push({f:2,voice:1,dur:9,t:'🎤 رسالة صوتية',d:NOW-2*3600e3});
+function toast(x){const t=$('toast');t.textContent=x;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2600)}
+
+function renderChats(){
+  const l=$('chatList');l.textContent='';
+  state.users.filter(u=>u.id!==state.me.id&&!u.banned).sort((a,b)=>((lastOf(b)||{}).d||0)-((lastOf(a)||{}).d||0)).forEach(u=>{
+    const last=lastOf(u),r=el('div','row'),st=state.stories[u.id],prot=state.protectedIds.includes(u.id);
+    r.tabIndex=0;
+    const av=el('div','av'+(u.id===0?' sys':''),u.id===0?'A':u.name[0]);
+    const ring=el('div','ring'+(st?(st.seen?' seen':' new'):''));ring.appendChild(av);
+    if(st){ring.setAttribute('role','button');ring.tabIndex=0;ring.setAttribute('aria-label','عرض الحالة');
+      const go=e=>{e.stopPropagation();openStory(u)};ring.onclick=go;ring.onkeydown=e=>{if(e.key==='Enter')go(e)}}
+    const t=el('div','t'),nm=el('b',null,u.name);if(prot)nm.append(' 🔒');
+    t.append(nm,el('small',null,prot?'محادثة محمية':last?last.t:'ابدأ المحادثة'));
+    const side=el('div');side.style.cssText='display:flex;flex-direction:column;align-items:flex-end;gap:6px';
+    side.appendChild(el('small',null,last?time(last.d):''));
+    const n=(state.msgs[u.id]||[]).filter(m=>m.f!==state.me.id&&!m.r).length;
+    if(n)side.appendChild(el('span','unread',String(n)));
+    r.append(ring,t,side);
+    r.onclick=()=>openChat(u);r.onkeydown=e=>{if(e.key==='Enter')openChat(u)};l.appendChild(r)})}
+
+function openChat(u){
+  if(state.protectedIds.includes(u.id)&&!state.unlocked[u.id]){bioAuth(()=>{state.unlocked[u.id]=true;enterChat(u)});return}
+  enterChat(u)}
+function enterChat(u){state.cur=u;$('cName').textContent=u.name;$('cAv').textContent=u.id===0?'A':u.name[0];
+  $('cStatus').textContent=u.id===0?'قناة رسمية':'نشط الآن';$('cStatus').style.color=u.id===0?'var(--gold)':'#34C759';
+  $('txt').disabled=u.id===0;$('micBtn').disabled=u.id===0;
+  $('txt').placeholder=u.id===0?'قناة رسمية — للقراءة فقط':'اكتب رسالة';renderMsgs();show('chat')}
+
+function voiceUI(m){
+  const w=el('div','vn'),btn=el('button','vplay','▶'),wave=el('div','wave');
+  btn.type='button';btn.setAttribute('aria-label','تشغيل');
+  (m.bars||(m.bars=mkBars(26,m.d))).forEach((h,i)=>{const b=el('span');b.style.height=h+'%';b.style.animationDelay=(i%6)*70+'ms';wave.appendChild(b)});
+  let timer=0,playing=false,audio=null;
+  const paint=f=>{const k=Math.round(Math.min(1,f)*wave.children.length);[...wave.children].forEach((b,i)=>b.classList.toggle('on',i<k))};
+  const stop=()=>{playing=false;clearInterval(timer);btn.textContent='▶';w.classList.remove('playing');if(audio)audio.pause()};
+  btn.onclick=e=>{e.stopPropagation();if(playing){stop();return}
+    playing=true;btn.textContent='❚❚';w.classList.add('playing');
+    if(m.url){audio=audio||new Audio(m.url);audio.ontimeupdate=()=>paint(audio.currentTime/(audio.duration&&isFinite(audio.duration)?audio.duration:m.dur));audio.onended=()=>{stop();paint(0)};audio.play().catch(stop)}
+    else{const t0=Date.now();timer=setInterval(()=>{const f=(Date.now()-t0)/1000/m.dur;paint(f);if(f>=1){stop();paint(0)}},80)}};
+  w.append(btn,wave,el('span','vdur',fmtDur(m.dur)));return w}
+
+const EMO=['👍','❤️','😂','😮','🙏','🔥'];
+function closeReact(){const m=$('rmenu');if(m)m.remove();document.removeEventListener('pointerdown',outsideReact,true)}
+function outsideReact(e){if(!e.target.closest('#rmenu'))closeReact()}
+function reactMenu(d,m){
+  closeReact();
+  const menu=el('div','rmenu');menu.id='rmenu';menu.setAttribute('role','menu');
+  EMO.forEach((x,i)=>{const b=el('button','remo',x);b.type='button';b.style.animationDelay=(i*45)+'ms';b.setAttribute('aria-label',x);
+    b.onclick=()=>{m.react=(m.react===x?null:x);closeReact();renderMsgs()};menu.appendChild(b)});
+  if(state.me&&m.f===state.me.id){const x=el('button','remo','🗑');x.type='button';x.setAttribute('aria-label','حذف الرسالة');x.onclick=()=>{const a=state.msgs[state.cur.id],i=a.indexOf(m);if(i>-1)a.splice(i,1);closeReact();renderMsgs()};menu.appendChild(x)}
+  document.body.appendChild(menu);
+  const r=d.getBoundingClientRect(),mw=menu.offsetWidth;
+  menu.style.left=Math.min(Math.max(8,r.left+r.width/2-mw/2),innerWidth-mw-8)+'px';
+  menu.style.top=Math.max(8,r.top-62)+'px';
+  if(navigator.vibrate)try{navigator.vibrate(12)}catch(e){}
+  setTimeout(()=>document.addEventListener('pointerdown',outsideReact,true),0)}
+function bindPress(d,m){
+  let tm=0,sx=0,sy=0;
+  d.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;sx=e.clientX;sy=e.clientY;tm=setTimeout(()=>reactMenu(d,m),480)});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>d.addEventListener(ev,()=>clearTimeout(tm)));
+  d.addEventListener('pointermove',e=>{if(Math.abs(e.clientX-sx)+Math.abs(e.clientY-sy)>10)clearTimeout(tm)});
+  d.addEventListener('contextmenu',e=>{e.preventDefault();reactMenu(d,m)})}
+
+function renderMsgs(){const box=$('msgs');box.textContent='';
+  (state.msgs[state.cur.id]||[]).forEach(m=>{const mine=state.me&&m.f===state.me.id;
+    const d=el('div','m'+(mine?' me':'')+(m.voice?' voice':''));
+    if(m.voice)d.appendChild(voiceUI(m));else d.appendChild(document.createTextNode(m.t));
+    d.appendChild(el('i',null,time(m.d)+(mine?' ✓✓':'')));
+    if(m.react){d.appendChild(el('b','react',m.react));d.classList.add('hasr')}
+    bindPress(d,m);box.appendChild(d)});
+  (state.msgs[state.cur.id]||[]).forEach(m=>{m.r=1});box.scrollTop=box.scrollHeight}
+
+function deliver(to,msg){
+  (state.msgs[to.id]=state.msgs[to.id]||[]).push(msg);
+  const inThis=state.cur===to&&$('v-chat').classList.contains('on');
+  if(inThis)renderMsgs();else island(to,msg);
+  if($('v-chats').classList.contains('on'))renderChats()}
+function pushMsg(to,msg){
+  (state.msgs[to.id]=state.msgs[to.id]||[]).push(msg);renderMsgs();
+  setTimeout(()=>{if(to.banned||!state.me||!state.msgs[to.id])return;
+    deliver(to,{f:to.id,t:replies[Math.floor(Math.random()*replies.length)],d:Date.now()})},1200)}
+function sendMsg(){const t=$('txt').value.trim();if(!t||!state.cur||state.cur.id===0)return;
+  $('txt').value='';pushMsg(state.cur,{f:state.me.id,t,d:Date.now()})}
+$('sendMsg').onclick=sendMsg;$('txt').onkeydown=e=>{if(e.key==='Enter')sendMsg()};
+
+/* ===== الجزيرة الديناميكية ===== */
+let islandT=0;
+function collapseIsland(){$('island').classList.remove('open')}
+function island(u,m){
+  if(!state.me||u.banned)return;
+  const box=$('island'),prot=state.protectedIds.includes(u.id);
+  box.textContent='';
+  const tx=el('div','itext');tx.append(el('b',null,u.name),el('span',null,prot?'🔒 رسالة جديدة':m.t));
+  box.append(el('div','av',u.name[0]),tx);
+  box.onclick=()=>{collapseIsland();if(state.me)openChat(u)};
+  box.classList.remove('open');void box.offsetWidth;box.classList.add('open');
+  if(navigator.vibrate)try{navigator.vibrate(15)}catch(e){}
+  clearTimeout(islandT);islandT=setTimeout(collapseIsland,3800)}
+let demoDone=false;
+function scheduleDemo(){if(demoDone)return;demoDone=true;
+  setTimeout(()=>{const u=state.users.find(x=>x.id===1);if(state.me&&u&&!u.banned)deliver(u,{f:1,t:'وصلتك الصور؟ 📸',d:Date.now()})},6000)}
+
+/* ===== القفل البيومتري ===== */
+let bioCb=null;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function webAuthn(){
+  if(!window.PublicKeyCredential||!navigator.credentials)throw new Error('na');
+  if(!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()))throw new Error('na');
+  const ch=crypto.getRandomValues(new Uint8Array(32));let id=null;
+  try{id=localStorage.getItem('abdoCred')}catch(e){}
+  if(id){const raw=Uint8Array.from(atob(id),c=>c.charCodeAt(0));
+    await navigator.credentials.get({publicKey:{challenge:ch,allowCredentials:[{id:raw,type:'public-key',transports:['internal']}],userVerification:'required',timeout:60000}});return}
+  const cred=await navigator.credentials.create({publicKey:{challenge:ch,rp:{name:'ABDO Chat'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'abdo-user',displayName:'ABDO user'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'},timeout:60000}});
+  try{localStorage.setItem('abdoCred',btoa(String.fromCharCode(...new Uint8Array(cred.rawId))))}catch(e){}}
+function bioAuth(cb){bioCb=cb;const b=$('bio');b.classList.remove('open');b.hidden=false;
+  $('face').className='face';$('bioMsg').textContent='المس للتحقق من هويتك';$('bioNote').textContent='';
+  $('bioBtn').disabled=false;$('bioDemo').hidden=true;setTimeout(()=>$('bioBtn').focus(),60)}
+async function bioRun(){
+  $('bioBtn').disabled=true;$('face').className='face scan';$('bioMsg').textContent='جارٍ التحقق…';
+  try{await webAuthn();bioOk()}
+  catch(e){$('face').className='face';$('bioBtn').disabled=false;$('bioMsg').textContent='تعذّر التحقق البيومتري';
+    $('bioNote').textContent='الجهاز أو المتصفح لا يسمح بذلك هنا.';$('bioDemo').hidden=!CONFIG.bioDemo}}
+async function bioDemoRun(){
+  $('bioDemo').hidden=true;$('bioBtn').disabled=true;$('face').className='face scan';$('bioMsg').textContent='جارٍ التحقق…';
+  await sleep(1300);$('bioNote').textContent='محاكاة تجريبية — ليست تحققًا حقيقيًا.';bioOk()}
+function bioOk(){$('face').className='face ok';$('bioMsg').textContent='تم التحقق';
+  if(navigator.vibrate)try{navigator.vibrate([18,40,18])}catch(e){}
+  setTimeout(()=>{$('bio').classList.add('open');setTimeout(()=>{$('bio').hidden=true;const cb=bioCb;bioCb=null;if(cb)cb()},450)},650)}
+function bioClose(){$('bio').hidden=true;bioCb=null}
+$('bioBtn').onclick=bioRun;$('bioDemo').onclick=bioDemoRun;$('bioCancel').onclick=bioClose;
+
+/* ===== الحالات (Stories) ===== */
+let stT=0;
+function openStory(u){const st=state.stories[u.id];if(!st)return;
+  $('sAv').textContent=u.name[0];$('sName').textContent=u.name;$('sText').textContent=st.t;
+  const p=$('sprog');p.style.transition='none';p.style.width='0';$('story').hidden=false;void p.offsetWidth;
+  p.style.transition='width 4.5s linear';p.style.width='100%';
+  st.seen=true;clearTimeout(stT);stT=setTimeout(closeStory,4600)}
+function closeStory(){clearTimeout(stT);$('story').hidden=true;if(state.me&&$('v-chats').classList.contains('on'))renderChats()}
+$('sClose').onclick=closeStory;
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('bio').hidden)bioClose();if(!$('story').hidden)closeStory();closeReact()});
+
+/* ===== تسجيل صوتي ===== */
+let rec=null,recT0=0,recTimer=0,recChunks=[];
+$('micBtn').onclick=async()=>{
+  if(rec){rec.stop();return}
+  if(!state.cur||state.cur.id===0)return;
+  try{
+    const st=await navigator.mediaDevices.getUserMedia({audio:true}),to=state.cur;
+    rec=new MediaRecorder(st);recChunks=[];recT0=Date.now();
+    rec.ondataavailable=e=>recChunks.push(e.data);
+    rec.onstop=()=>{st.getTracks().forEach(t=>t.stop());clearInterval(recTimer);
+      $('micBtn').classList.remove('rec');$('txt').placeholder='اكتب رسالة';
+      const dur=Math.max(1,Math.round((Date.now()-recT0)/1000)),blob=new Blob(recChunks,{type:rec.mimeType});rec=null;
+      pushMsg(to,{f:state.me.id,voice:1,t:'🎤 رسالة صوتية',dur,url:URL.createObjectURL(blob),d:Date.now()})};
+    rec.start();$('micBtn').classList.add('rec');
+    recTimer=setInterval(()=>{$('txt').placeholder='● '+fmtDur((Date.now()-recT0)/1000)},400);
+  }catch(e){toast('تعذّر الوصول إلى الميكروفون')}};
+$('back').onclick=()=>{state.unlocked={};renderChats();show('chats')};
+
+/* ===== بوابة المدير: مخفية — اضغط الشعار 7 مرات متتالية ===== */
+let taps=0,tapT=0;
+function secret(){const n=Date.now();taps=(n-tapT<2000)?taps+1:1;tapT=n;
+  if(taps>=7){taps=0;pin='';drawPin();$('pinErr').textContent='';show('pin')}}
+let pin='',tries=0,lockUntil=0;
+const sha=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(x=>x.toString(16).padStart(2,'0')).join('');
+const drawPin=()=>document.querySelectorAll('#dots i').forEach((d,i)=>d.classList.toggle('f',i<pin.length));
+['1','2','3','4','5','6','7','8','9','c','0','b'].forEach(k=>{const b=el('button',null,k==='c'?'✕':k==='b'?'⌫':k);b.type='button';b.setAttribute('aria-label',k==='c'?'إلغاء':k==='b'?'حذف':k);b.onclick=()=>pinPress(k);$('pad').appendChild(b)});
+async function pinPress(k){
+  const err=$('pinErr');
+  if(k==='c'){pin='';drawPin();err.textContent='';show(state.me?'chats':'phone');return}
+  if(k==='b'){pin=pin.slice(0,-1);drawPin();return}
+  if(Date.now()<lockUntil){err.textContent='محاولات كثيرة، انتظر '+Math.ceil((lockUntil-Date.now())/1000)+' ثانية';return}
+  if(pin.length>=5)return;
+  pin+=k;drawPin();err.textContent='';
+  if(pin.length<5)return;
+  let h='';
+  try{h=await sha(pin)}catch(e){err.textContent='المتصفح لا يدعم التحقق الآمن';pin='';drawPin();return}
+  if(h===PIN_CUR){state.admin=true;pin='';tries=0;drawPin();state.tab='ov';addLog('دخول المدير');renderAdmin();show('admin')}
+  else{tries++;pin='';drawPin();err.textContent='الرمز غير صحيح';
+    const d=$('dots');d.classList.remove('shake');void d.offsetWidth;d.classList.add('shake');
+    if(tries>=5){lockUntil=Date.now()+30000;tries=0;err.textContent='تم القفل 30 ثانية'}}}
+document.addEventListener('keydown',e=>{
+  if(!$('v-pin').classList.contains('on'))return;
+  if(/^\d$/.test(e.key))pinPress(e.key);else if(e.key==='Backspace')pinPress('b');else if(e.key==='Escape')pinPress('c')});
+
+/* ===== لوحة المدير ===== */
+const real=()=>state.users.filter(u=>u.id!==0);
+const allMsgs=()=>{const o=[];for(const k in state.msgs)state.msgs[k].forEach(m=>o.push({k:+k,m}));return o};
+const card=(t)=>{const c=el('div','c2');if(t)c.appendChild(el('h3',null,t));return c};
+function renderAdmin(){
+  if(!state.admin){show(state.me?'chats':'phone');return}
+  document.querySelectorAll('#aNav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===state.tab));
+  const body=$('aBody');body.textContent='';({ov:tabOv,us:tabUs,ms:tabMs,st:tabSt})[state.tab](body)}
+function tabOv(body){
+  const am=allMsgs(),mid=new Date().setHours(0,0,0,0),g=el('div','stats');
+  [[real().length,'المستخدمون'],[am.length,'إجمالي الرسائل'],[real().filter(u=>u.banned).length,'المحظورون'],[am.filter(x=>x.m.d>=mid).length,'رسائل اليوم']].forEach(([n,l])=>{
+    const s=el('div','stat');s.append(el('b',null,String(n)),el('span',null,l));g.appendChild(s)});
+  body.appendChild(g);
+  const c=card('الرسائل خلال آخر 7 أيام'),ch=el('div','chart'),cnt=[];
+  for(let i=6;i>=0;i--){const s=mid-i*DAY;cnt.push([s,am.filter(x=>x.m.d>=s&&x.m.d<s+DAY).length])}
+  const mx=Math.max(1,...cnt.map(x=>x[1]));
+  cnt.forEach(([s,n])=>{const b=el('div','bar'),bar=el('i');bar.style.height=(n/mx*80)+'%';b.append(el('span',null,String(n)),bar,el('span',null,new Date(s).toLocaleDateString('ar',{weekday:'short'})));ch.appendChild(b)});
+  c.appendChild(ch);body.appendChild(c);
+  const l=card('آخر النشاطات');
+  if(!state.log.length)l.appendChild(el('div','lg','لا يوجد نشاط بعد'));
+  state.log.slice(0,8).forEach(x=>{const r=el('div','lg');r.append(el('span',null,x.t),el('small',null,time(x.d)));l.appendChild(r)});
+  body.appendChild(l)}
+function tabUs(body){
+  const c=card('إدارة المستخدمين'),q=el('input');q.placeholder='بحث بالاسم أو الرقم';q.value=state.q;q.setAttribute('aria-label','بحث');
+  const box=el('div');box.style.marginTop='8px';c.append(q,box);body.appendChild(c);
+  const fill=()=>{box.textContent='';state.q=q.value.trim();
+    const list=real().filter(u=>(u.name+u.phone).includes(state.q));
+    if(!list.length)box.appendChild(el('div','lg','لا نتائج'));
+    list.forEach(u=>{const r=el('div','urow'),t=el('div','t'),s=el('small',null,u.phone+(u.banned?' · محظور':''));
+      t.append(el('b',null,u.name),s);
+      const ban=el('button','btn sm'+(u.banned?'':' red'),u.banned?'رفع الحظر':'حظر');
+      ban.onclick=()=>{u.banned=!u.banned;addLog((u.banned?'حظر ':'رفع حظر ')+u.name);fill()};
+      const del=el('button','btn sm gh','حذف');
+      del.onclick=()=>{if(del.dataset.c){state.users=state.users.filter(x=>x!==u);delete state.msgs[u.id];addLog('حذف '+u.name);fill()}
+        else{del.dataset.c=1;del.textContent='تأكيد؟';setTimeout(()=>{if(del.isConnected){del.dataset.c='';del.textContent='حذف'}},3000)}};
+      const ren=el('button','btn sm gh','تعديل الاسم');ren.onclick=()=>{const n=(prompt('الاسم الجديد',u.name)||'').trim().slice(0,30);if(n){addLog('تعديل اسم '+u.name+' إلى '+n);u.name=n;fill()}};
+      const pr=state.protectedIds.includes(u.id),lk=el('button','btn sm gh',pr?'إزالة القفل 🔓':'قفل المحادثة 🔒');
+      lk.onclick=()=>{state.protectedIds=pr?state.protectedIds.filter(x=>x!==u.id):[...state.protectedIds,u.id];addLog((pr?'إزالة قفل ':'قفل ')+u.name);fill()};
+      const ac=el('div','acts');ac.append(ban,ren,lk,del);
+      r.append(el('div','av',u.name[0]),t,ac);box.appendChild(r)})};
+  q.oninput=fill;fill()}
+function tabMs(body){
+  const c=card('إعلان لجميع المستخدمين'),row=el('div','bc'),i=el('input'),b=el('button','btn sm','إرسال');
+  i.placeholder='نص الإعلان';i.maxLength=300;i.setAttribute('aria-label','نص الإعلان');
+  b.onclick=()=>{const t=i.value.trim();if(!t)return;state.msgs[0].push({f:0,t:'📢 إعلان من الإدارة: '+t,d:Date.now()});addLog('إرسال إعلان');renderAdmin()};
+  row.append(i,b);c.appendChild(row);body.appendChild(c);
+  const l=card('سجل الرسائل (للإشراف)');
+  allMsgs().sort((a,b)=>b.m.d-a.m.d).slice(0,40).forEach(({k,m})=>{
+    const r=el('div','mrow'),t=el('div','t');
+    t.append(el('small',null,nameOf(m.f)+' · المحادثة: '+nameOf(k)+' · '+time(m.d)),document.createTextNode(m.t));
+    const x=el('button','btn sm gh','✕');x.setAttribute('aria-label','حذف الرسالة');
+    x.onclick=()=>{const a=state.msgs[k],ix=a.indexOf(m);if(ix>-1)a.splice(ix,1);addLog('حذف رسالة');renderAdmin()};
+    r.append(t,x);l.appendChild(r)});
+  body.appendChild(l)}
+function tabSt(body){
+  const c=card('رسالة الترحيب'),w=el('textarea');w.rows=3;w.maxLength=200;w.value=state.welcome;w.setAttribute('aria-label','رسالة الترحيب');
+  const s=el('button','btn','حفظ');
+  s.onclick=()=>{const t=w.value.trim();if(!t)return;state.welcome=t;const m=state.msgs[0].find(x=>x.w);if(m)m.t=t;addLog('تعديل رسالة الترحيب');s.textContent='تم الحفظ ✓'};
+  c.append(w,s);body.appendChild(c);
+  const r=card('التسجيل'),tg=el('div','tog'),bt=el('button','btn sm'+(state.open?'':' red'),state.open?'مفتوح':'مغلق');
+  bt.onclick=()=>{state.open=!state.open;addLog(state.open?'فتح التسجيل':'إغلاق التسجيل');renderAdmin()};
+  tg.append(el('span',null,'السماح بتسجيل أرقام جديدة'),bt);r.appendChild(tg);body.appendChild(r);
+  const pc=card('تغيير رمز المدير'),pi=el('input');pi.type='password';pi.inputMode='numeric';pi.maxLength=5;pi.placeholder='5 أرقام';pi.setAttribute('aria-label','الرمز الجديد');
+  const pb=el('button','btn','تحديث الرمز');pb.onclick=async()=>{if(!/^\d{5}$/.test(pi.value)){toast('الرمز يجب أن يكون 5 أرقام');return}PIN_CUR=await sha(pi.value);try{localStorage.setItem('abdoPin',PIN_CUR)}catch(e){}addLog('تغيير رمز المدير');pi.value='';toast('تم تحديث الرمز')};
+  pc.append(pi,pb);body.appendChild(pc);
+  const dc=card('البيانات'),ex=el('button','btn gh','تصدير نسخة احتياطية (JSON)'),rs=el('button','btn red','إعادة ضبط كل البيانات');
+  ex.onclick=()=>{const a=el('a');a.href=URL.createObjectURL(new Blob([snap()],{type:'application/json'}));a.download='abdo-chat-backup.json';a.click();addLog('تصدير نسخة احتياطية')};
+  rs.onclick=()=>{if(rs.dataset.c){noSave=true;try{localStorage.removeItem(KEY)}catch(e){}location.reload()}else{rs.dataset.c=1;rs.textContent='اضغط مرة أخرى للتأكيد';setTimeout(()=>{rs.dataset.c='';rs.textContent='إعادة ضبط كل البيانات'},3000)}};
+  dc.append(ex,rs);body.appendChild(dc);
+  body.appendChild(el('div','hint','رمز المدير محفوظ كبصمة SHA-256. لحماية حقيقية انقل التحقق وصلاحيات المدير إلى السيرفر.'))}
+$('aNav').onclick=e=>{const b=e.target.closest('[data-tab]');if(b){state.tab=b.dataset.tab;renderAdmin()}};
+$('aExit').onclick=()=>{state.admin=false;if(state.me){renderChats();show('chats')}else show('phone')};
+
+document.querySelector('#v-phone .logo').onclick=secret;document.querySelector('#v-chats .mark').onclick=secret;
+document.addEventListener('click',e=>{
+  if(e.target.closest('.prof')&&state.me){const n=(prompt('اسمك',state.me.name)||'').trim().slice(0,30);if(n){addLog('تغيير اسم '+state.me.name+' إلى '+n);state.me.name=n;renderChats();toast('تم حفظ الاسم')}}
+  if(e.target.closest('.out')){state.admin=false;state.me=null;state.cur=null;$('phone').value='';show('phone')}});
+
+/* ===== اللغة AR / EN ===== */
+const I18N={
+ar:{sub:'محادثات آمنة بأسلوب أنيق',e2e:'مشفّرة من طرف إلى طرف',phoneLbl:'رقم الجوال',send:'إرسال رمز التحقق',demo:'وضع تجريبي – رمز التحقق:',otpTitle:'رمز التحقق',otpTo:'أرسلنا رمزًا إلى',verify:'تأكيد ودخول',change:'تغيير الرقم',errPhone:'أدخل رقم جوال صحيح بدون رمز الدولة',errBanned:'هذا الحساب محظور. تواصل مع الإدارة.',errClosed:'التسجيل مغلق حاليًا.',errCode:'الرمز غير صحيح',tChats:'المحادثات',tOut:'خروج',back:'→'},
+en:{sub:'Secure chats, elegantly',e2e:'End-to-End Encrypted',phoneLbl:'Phone number',send:'Send verification code',demo:'Demo mode – code:',otpTitle:'Verification code',otpTo:'We sent a code to',verify:'Verify & continue',change:'Change number',errPhone:'Enter a valid phone number without the country code',errBanned:'This account is banned. Contact support.',errClosed:'Registration is currently closed.',errCode:'Incorrect code',tChats:'Chats',tOut:'Sign out',back:'←'}};
+let lang='ar';
+try{if(localStorage.getItem('abdoLang')==='en')lang='en'}catch(e){}
+const t=k=>I18N[lang][k];
+function renderOtpTo(){$('otpTo').textContent=state.e164?t('otpTo')+' '+state.e164:''}
+function applyLang(){
+  document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-i]').forEach(n=>{n.textContent=t(n.dataset.i)});
+  document.querySelectorAll('.lang-btn').forEach(b=>{b.textContent=lang==='ar'?'EN':'AR'});
+  $('otpBack').textContent=t('back');
+  const h=$('demoHint');h.textContent='';if(!CONFIG.firebase)h.append(t('demo')+' ',el('span',null,CONFIG.demoCode));
+  $('e2e').hidden=!CONFIG.e2eBadge;renderOtpTo()}
+document.querySelectorAll('.lang-btn').forEach(b=>{b.onclick=()=>{lang=lang==='ar'?'en':'ar';try{localStorage.setItem('abdoLang',lang)}catch(e){}applyLang()}});
+
+/* ===== مربعات OTP ===== */
+const boxes=[];
+for(let i=0;i<6;i++){
+  const b=el('input','otp-box');b.type='text';b.inputMode='numeric';b.maxLength=1;b.autocomplete=i===0?'one-time-code':'off';b.setAttribute('aria-label','Digit '+(i+1));
+  $('otpBoxes').appendChild(b);boxes.push(b);
+  b.addEventListener('focus',()=>b.select());
+  b.addEventListener('input',()=>{b.value=b.value.replace(/\D/g,'').slice(-1);b.classList.toggle('f',!!b.value);
+    if(b.value&&i<5)boxes[i+1].focus();
+    if(getOtp().length===6)$('verify').click()});
+  b.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!b.value&&i>0){boxes[i-1].value='';boxes[i-1].classList.remove('f');boxes[i-1].focus()}});
+  b.addEventListener('paste',e=>{e.preventDefault();
+    const d=((e.clipboardData&&e.clipboardData.getData('text'))||'').replace(/\D/g,'').slice(0,6);
+    if(!d)return;d.split('').forEach((c,j)=>{boxes[j].value=c;boxes[j].classList.add('f')});
+    boxes[Math.min(d.length,5)].focus();if(d.length===6)$('verify').click()});
+}
+function getOtp(){return boxes.map(b=>b.value).join('')}
+function clearOtp(){boxes.forEach(b=>{b.value='';b.classList.remove('f')})}
+function focusOtp(){setTimeout(()=>boxes[0].focus(),60)}
+function shakeOtp(){const w=$('otpBoxes');clearOtp();w.classList.remove('shake');void w.offsetWidth;w.classList.add('shake');boxes[0].focus()}
+
+/* ===== تأثير الضغط (Ripple) ===== */
+document.addEventListener('pointerdown',e=>{
+  const b=e.target.closest('button');
+  if(!b||b.disabled||b.classList.contains('remo')||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2,sp=el('span','ripple');
+  sp.style.cssText='width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';
+  b.appendChild(sp);setTimeout(()=>sp.remove(),600)});
+
+/* ===== الحفظ التلقائي (localStorage) ===== */
+const KEY='abdoChatV1';let noSave=false;
+function snap(){const o={users:state.users,msgs:{},open:state.open,welcome:state.welcome,log:state.log,stories:state.stories,protectedIds:state.protectedIds,me:state.me?state.me.id:null};
+  for(const k in state.msgs)o.msgs[k]=state.msgs[k].map(m=>{const c={...m};delete c.url;return c});return JSON.stringify(o)}
+function save(){if(noSave)return;try{localStorage.setItem(KEY,snap())}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(!s||!s.users)return;
+  state.users=s.users;state.msgs=s.msgs||{};if(!state.msgs[0])state.msgs[0]=[];state.open=s.open!==false;state.welcome=s.welcome||state.welcome;
+  state.log=s.log||[];state.stories=s.stories||{};state.protectedIds=s.protectedIds||[];
+  const u=state.users.find(x=>x.id===s.me);
+  if(u&&!u.banned){state.me=u;demoDone=true;renderChats();show('chats')}}catch(e){}}
+load();setInterval(save,2000);addEventListener('visibilitychange',save);addEventListener('pagehide',save);
+
+applyLang();
+</script>
+</body>
+</html>
